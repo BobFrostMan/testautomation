@@ -1,24 +1,27 @@
 package com.alevel;
 
 import com.alevel.dataprovider.GeneralDataProvider;
+import com.alevel.entity.SearchResultItem;
 import com.alevel.web.ui.pages.MainPage;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.Test;
 
 import java.util.List;
 
 public class SearchTests extends TestBase {
 
-    @Test(dataProviderClass = GeneralDataProvider.class, dataProvider = "provide")
+    @Test(dataProviderClass = GeneralDataProvider.class, dataProvider = "provide",
+            description = "Check search is working on the main page")
     public void checkSearchResultsPO(String searchText) {
-        List<WebElement> searchResults = new MainPage(driver)
-                        .inputSearchText(searchText)
-                        .startSearch()
-                        .getSearchResults();
+        List<SearchResultItem> searchResults = new MainPage(driver)
+                .inputSearchText(searchText)
+                .startSearch()
+                .getSearchResults();
 
-        for (WebElement result : searchResults) {
-            Assert.assertTrue(helper.containsIgnoreCase(result.getText(), searchText));
+        for (SearchResultItem result : searchResults) {
+            Assert.assertTrue(result.containsInfo(searchText),
+                    "Search result doesn't contain text '" + searchText + "'\n" +
+                            "Found search result:\n" + result);
         }
     }
 }

@@ -6,3 +6,4 @@ out
 *.log
 *.class
 *.iml
+.allure

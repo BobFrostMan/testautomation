@@ -3,6 +3,7 @@ package com.alevel;
 import com.alevel.config.EnvConfig;
 import com.alevel.helper.VerificationHelper;
 import com.alevel.web.ui.driver.WebDriverFactory;
+import io.qameta.allure.Step;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterTest;
@@ -31,10 +32,7 @@ public abstract class TestBase {
     @BeforeTest
     public void setUp() {
         config = new EnvConfig(System.getProperty("environment", "prod"));
-
-        driver = WebDriverFactory.getDriver(System.getProperty("browser", "chrome"));
-        driver.manage().timeouts().pageLoadTimeout(config.getTimeoutPageload(), TimeUnit.SECONDS);
-        driver.manage().timeouts().implicitlyWait(config.getTimeoutElemWait(), TimeUnit.SECONDS);
+        initWebDriver(System.getProperty("browser", "chrome"));
 
         helper = new VerificationHelper();
     }
@@ -42,11 +40,24 @@ public abstract class TestBase {
     //Выполняется перед каждым методом помеченным аннотацией @Test
     @BeforeMethod
     public void openPage(){
-        LOGGER.info("Opened page with url " + config.getWebUrl());
-        driver.get(config.getWebUrl());
+        openDouPage(config.getWebUrl());
+    }
+
+    @Step("Open dou main page")
+    private void openDouPage(String url){
+        LOGGER.info("Opened page with url " + url);
+        driver.get(url);
+    }
+
+    @Step("Initializing {0} webdriver")
+    private void initWebDriver(String driverName){
+        driver = WebDriverFactory.getDriver(driverName);
+        driver.manage().timeouts().pageLoadTimeout(config.getTimeoutPageload(), TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(config.getTimeoutElemWait(), TimeUnit.SECONDS);
     }
 
     @AfterTest
+    @Step("Closing driver")
     public void tearDown() {
         if (driver != null) {
             driver.quit();
